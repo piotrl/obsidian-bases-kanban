@@ -4,10 +4,13 @@ import {
 	BasesView,
 	QueryController,
     TFile,
-    ViewOption
+    ViewOption,
+    Menu
 } from 'obsidian';
 import { KanbanBoard } from './components/KanbanBoard';
 import type ObsidianBasesKanbanPlugin from './main';
+import { KanbanItem } from './types';
+import { mapBasesData } from './utils/dataMapping';
 
 export const KANBAN_VIEW_TYPE = 'kanban';
 
@@ -24,9 +27,9 @@ export class KanbanView extends BasesView {
     }
 
     get groupByConfig(): { property: string, direction: string } | null {
-        const groupByConfig = this.config && this.config!.groupBy;
+        const groupByConfig = (this.config as any)?.groupBy;
         if (!groupByConfig) return null;
-        
+         
         return groupByConfig;
     }
 
@@ -93,64 +96,7 @@ export class KanbanView extends BasesView {
         const sortDirection = this.config?.get('sortDirection') as 'ASC' | 'DESC';
 
         // Map entries to a format compatible with KanbanBoard
-        const mappedData = entries.map(entry => {
-            // entry is typically a BasesEntry
-            // it has .file (TFile) and .getValue(propId)
-            
-            const file = entry.file; 
-            if (!file) {
-                 // Fallback if entry is just the file itself or raw data
-                 return { id: Math.random().toString(), name: "Unknown" };
-            }
-
-            const mappedItem: any = {
-                id: file.path,
-                file: file,
-                name: file.basename,
-                // Pass original entry for advanced usage if needed
-                _entry: entry 
-            };
-            
-            const injectProp = (prop: string) => {
-                let foundValue = false;
-                // Try using getValue if available (BasesEntry)
-                if (typeof entry.getValue === 'function') {
-                    try {
-                        const val = entry.getValue(prop);
-                        // Value items according to docs have .isEmpty() and .toString()
-                        if (val && typeof val.isEmpty === 'function') {
-                            if (!val.isEmpty()) {
-                                mappedItem[prop] = val.toString();
-                            } else {
-                                mappedItem[prop] = null;
-                            }
-                            foundValue = true;
-                        } else if (val !== undefined && val !== null) {
-                            // Fallback if it returns a primitive or unexpected object
-                            mappedItem[prop] = String(val);
-                            foundValue = true;
-                        }
-                    } catch (err) {
-                        // console.warn(`KanbanView: Error getting value for ${prop}`, err);
-                    }
-                } 
-                
-                if (!foundValue && entry.frontmatter) {
-                    // Fallback to frontmatter if available directly
-                    // Handle 'note.Status' -> 'Status' mapping for direct frontmatter access
-                    const propName = prop.includes('.') ? prop.split('.').pop()! : prop;
-                    mappedItem[prop] = entry.frontmatter[propName] || entry.frontmatter[prop];
-                    if (mappedItem[prop] !== undefined) foundValue = true;
-                }
-            };
-
-            // Inject the group by property value so KanbanBoard can find it
-            if (groupBy) injectProp(groupBy);
-            if (splitColumnsBy) injectProp(splitColumnsBy);
-            if (sortBy) injectProp(sortBy);
-
-            return mappedItem;
-        });
+        const mappedData = mapBasesData(entries, { groupBy, splitColumnsBy, sortBy });
 
         this.root.render(
             <KanbanBoard
@@ -193,8 +139,8 @@ export class KanbanView extends BasesView {
         });
     }
     
-    handleCardClick = (item: any, event: React.MouseEvent | React.PointerEvent) => {
-        if (!(item.file instanceof TFile)) return;
+    handleCardClick = (item: KanbanItem, event: React.MouseEvent | React.PointerEvent) => {
+        if (!item.file || !(item.file instanceof TFile)) return;
         const file = item.file as TFile;
 
         // Middle Click (Aux click, button 1) or Command/Ctrl + Click
@@ -208,7 +154,6 @@ export class KanbanView extends BasesView {
         if (event.type === 'contextmenu') {
             const nativeEvent = event.nativeEvent as MouseEvent;
             // Import Menu dynamically to avoid import issues or use global
-            const { Menu } = require('obsidian');
             const menu = new Menu();
             
             // @ts-ignore - leaf is available on ItemView/BasesView usually, maybe protected or named differently in BasesView
@@ -225,7 +170,7 @@ export class KanbanView extends BasesView {
         }
     }
 
-    handleCardUpdate = async (item: any, updates: { [key: string]: string }) => {
+    handleCardUpdate = async (item: KanbanItem, updates: { [key: string]: string }) => {
         const file = item.file; // data items in Bases are typically augmented TFiles or have .file property
         
         if (file instanceof TFile) {
