@@ -1,9 +1,20 @@
+# Kanban View for Obsidian Bases
+
+Adds a Kanban layout to [Obsidian Bases](https://help.obsidian.md/bases) so you can display notes in interactive groups.
+
+- Dynamically display cards that match your filters.
+- Group by any property.
+- Drag and drop to update property values.
+
+## Usage
+
+1. Open a Base.
+2. Switch to "Kanban" view.
+3. Select a property to "Group by" in the view options.
+4. Drag cards between columns to update their property value.
+
+
 # Obsidian Sample Plugin
-
-This is a sample plugin for Obsidian (https://obsidian.md).
-
-This project uses TypeScript to provide type checking and documentation.
-The repo depends on the latest plugin API (obsidian.d.ts) in TypeScript Definition format, which contains TSDoc comments describing what it does.
 
 This sample plugin demonstrates some of the basic functionality the plugin API can do.
 - Adds a ribbon icon, which shows a Notice when clicked.
