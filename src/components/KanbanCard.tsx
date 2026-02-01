@@ -1,11 +1,12 @@
 import * as React from 'react';
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
+import { KanbanItem } from '../types';
 
 interface Props {
   id: string;
-  item: any;
-  onCardClick?: (item: any, event: React.MouseEvent | React.PointerEvent) => void;
+  item: KanbanItem;
+  onCardClick?: (item: KanbanItem, event: React.MouseEvent | React.PointerEvent) => void;
 }
 
 export const KanbanCard: React.FC<Props> = ({ id, item, onCardClick }) => {

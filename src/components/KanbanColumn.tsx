@@ -2,12 +2,13 @@ import * as React from 'react';
 import { useDroppable } from '@dnd-kit/core';
 import { SortableContext, verticalListSortingStrategy } from '@dnd-kit/sortable';
 import { KanbanCard } from './KanbanCard';
+import { KanbanItem } from '../types';
 
 interface Props {
   id: string;
   title?: string;
-  items: any[];
-  onCardClick?: (item: any) => void;
+  items: KanbanItem[];
+  onCardClick?: (item: KanbanItem, event: React.MouseEvent | React.PointerEvent) => void;
   onAdd?: () => void;
 }
 
@@ -29,10 +30,10 @@ export const KanbanColumn: React.FC<Props> = ({ id, title, items, onCardClick, o
       </div>
       <div className="kanban-column-content">
         <SortableContext 
-            items={items.map((item: any) => item.file?.path || item.id || JSON.stringify(item))} 
+            items={items.map((item: KanbanItem) => item.file?.path || item.id || JSON.stringify(item))} 
             strategy={verticalListSortingStrategy}
         >
-          {items.map((item: any) => {
+          {items.map((item: KanbanItem) => {
              const key = item.file?.path || item.id || JSON.stringify(item);
              return <KanbanCard key={key} id={key} item={item} onCardClick={onCardClick} />;
           })}
