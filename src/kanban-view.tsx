@@ -54,11 +54,6 @@ export class KanbanView extends BasesView {
     onDataUpdated() {
         this.renderView();
     }
-    
-    // Force re-render on resize if needed, though React handles responsive layout
-    onResize() {
-        // ...
-    }
 
     renderView() {
         if (!this.root) {
