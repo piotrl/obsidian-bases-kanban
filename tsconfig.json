@@ -10,6 +10,7 @@
 		"noImplicitThis": true,
 		"noImplicitReturns": true,
 		"moduleResolution": "node",
+		"allowImportingTsExtensions": true,
 		"importHelpers": true,
 		"noUncheckedIndexedAccess": true,
 		"isolatedModules": true,
