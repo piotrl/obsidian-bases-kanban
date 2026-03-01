@@ -1,4 +1,4 @@
-import { KanbanItem } from '../types';
+import type { KanbanItem } from '../types';
 
 export function mapBasesData(
     entries: any[], 
@@ -14,7 +14,7 @@ export function mapBasesData(
         const file = entry.file; 
         if (!file) {
              // Fallback if entry is just the file itself or raw data
-             return { id: Math.random().toString(), name: "Unknown" } as KanbanItem;
+             return { id: crypto.randomUUID(), name: "Unknown" } as KanbanItem;
         }
 
         const mappedItem: KanbanItem = {
