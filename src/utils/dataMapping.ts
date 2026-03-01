@@ -1,4 +1,4 @@
-import { KanbanItem } from '../types';
+import type { KanbanItem } from '../types.ts';
 
 export function mapBasesData(
     entries: any[], 
